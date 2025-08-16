@@ -8,37 +8,37 @@ All colors MUST be HSL for consistency.
 
 @layer base {
   :root {
-    /* Mojo Dark Theme - Rich black with sophisticated accents */
-    --background: 240 6% 4%;  /* #0A0A0B - rich black */
-    --foreground: 0 0% 98%;   /* #FAFAFA - primary text */
+    /* Mojo Light Theme - Clean white with sophisticated accents */
+    --background: 0 0% 100%;   /* #FFFFFF - pure white */
+    --foreground: 240 10% 4%;  /* #0A0A0B - dark text */
     
-    --surface: 240 5% 7%;     /* #111113 - surface cards */
-    --surface-elevated: 240 5% 9%; /* Elevated cards */
+    --surface: 240 4% 97%;     /* #F8F8F9 - light surface cards */
+    --surface-elevated: 240 6% 95%; /* Slightly darker for elevation */
     
-    --card: 240 5% 7%;        /* #111113 - glassmorphic cards */
-    --card-foreground: 0 0% 98%;
+    --card: 240 4% 97%;        /* Light glassmorphic cards */
+    --card-foreground: 240 10% 4%;
 
-    --popover: 240 5% 7%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
 
-    --primary: 231 76% 62%;   /* #6366F1 - indigo with glow */
+    --primary: 231 76% 62%;    /* #6366F1 - indigo with glow */
     --primary-foreground: 0 0% 98%;
     --primary-glow: 231 76% 80%; /* Lighter primary for glow effects */
 
-    --secondary: 240 4% 64%;  /* #A1A1AA - secondary text */
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 5% 64%;   /* #9CA3AF - secondary text */
+    --secondary-foreground: 240 10% 4%;
 
-    --muted: 240 5% 15%;      /* Muted backgrounds */
-    --muted-foreground: 240 4% 64%; /* #A1A1AA */
+    --muted: 240 4% 95%;       /* Light muted backgrounds */
+    --muted-foreground: 240 4% 46%; /* #6B7280 */
 
-    --accent: 231 76% 62%;    /* Same as primary for consistency */
+    --accent: 231 76% 62%;     /* Same as primary for consistency */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 6% 15%;     /* #27272A - zinc-800 borders */
-    --input: 240 5% 7%;
+    --border: 240 6% 88%;      /* #E4E4E7 - light borders */
+    --input: 240 4% 97%;
     --ring: 231 76% 62%;
 
     --radius: 0.75rem;        /* Larger radius for modern feel */
@@ -54,16 +54,16 @@ All colors MUST be HSL for consistency.
 
     /* Gradients and Effects */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-mesh: radial-gradient(ellipse at top, hsl(var(--primary) / 0.1), transparent 60%),
-                     radial-gradient(ellipse at bottom right, hsl(var(--growth) / 0.1), transparent 60%);
+    --gradient-mesh: radial-gradient(ellipse at top, hsl(var(--primary) / 0.05), transparent 60%),
+                     radial-gradient(ellipse at bottom right, hsl(var(--growth) / 0.05), transparent 60%);
     --gradient-glass: linear-gradient(135deg, 
-                      hsl(var(--surface) / 0.8), 
-                      hsl(var(--surface-elevated) / 0.6));
+                      hsl(var(--surface) / 0.9), 
+                      hsl(var(--surface-elevated) / 0.8));
     
     /* Shadows and Glows */
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
-    --shadow-glass: 0 8px 32px hsl(240 5% 2% / 0.4);
-    --shadow-node: 0 4px 20px hsl(var(--primary) / 0.2);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.2);
+    --shadow-glass: 0 8px 32px hsl(240 10% 5% / 0.08);
+    --shadow-node: 0 4px 20px hsl(var(--primary) / 0.15);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -101,9 +101,9 @@ All colors MUST be HSL for consistency.
   .glass-card-elevated {
     @apply backdrop-blur-xl border border-border/30;
     background: linear-gradient(135deg, 
-                hsl(var(--surface-elevated) / 0.9), 
-                hsl(var(--surface) / 0.7));
-    box-shadow: var(--shadow-glass), 0 0 0 1px hsl(var(--border) / 0.1);
+                hsl(var(--surface-elevated) / 0.95), 
+                hsl(var(--surface) / 0.9));
+    box-shadow: var(--shadow-glass), 0 0 0 1px hsl(var(--border) / 0.2);
   }
 
   /* Interactive Elements */

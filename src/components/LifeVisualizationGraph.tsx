@@ -11,6 +11,12 @@ interface LifeCategory extends d3.SimulationNodeDatum {
   icon: string;
 }
 
+interface LifeConnection {
+  source: string;
+  target: string;
+  strength: number;
+}
+
 const defaultCategories: LifeCategory[] = [
   { id: 'health', name: 'Health', score: 75, weight: 9, color: 'hsl(var(--health))', icon: '💪' },
   { id: 'money', name: 'Money', score: 60, weight: 8, color: 'hsl(var(--money))', icon: '💰' },
@@ -21,8 +27,22 @@ const defaultCategories: LifeCategory[] = [
   { id: 'spirituality', name: 'Spirituality', score: 65, weight: 6, color: 'hsl(var(--spirituality))', icon: '🧘' },
 ];
 
+const defaultConnections: LifeConnection[] = [
+  { source: 'health', target: 'career', strength: 0.7 },
+  { source: 'health', target: 'love', strength: 0.6 },
+  { source: 'career', target: 'money', strength: 0.8 },
+  { source: 'career', target: 'growth', strength: 0.7 },
+  { source: 'social', target: 'love', strength: 0.8 },
+  { source: 'social', target: 'career', strength: 0.5 },
+  { source: 'growth', target: 'spirituality', strength: 0.6 },
+  { source: 'growth', target: 'health', strength: 0.5 },
+  { source: 'money', target: 'health', strength: 0.4 },
+  { source: 'love', target: 'spirituality', strength: 0.5 },
+];
+
 interface LifeVisualizationGraphProps {
   categories?: LifeCategory[];
+  connections?: LifeConnection[];
   onNodeClick?: (category: LifeCategory) => void;
   width?: number;
   height?: number;
@@ -30,6 +50,7 @@ interface LifeVisualizationGraphProps {
 
 export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
   categories = defaultCategories,
+  connections = defaultConnections,
   onNodeClick,
   width = 800,
   height = 600,
@@ -43,11 +64,31 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Create links data for D3
+    const links = connections.map(conn => ({
+      source: categories.find(c => c.id === conn.source),
+      target: categories.find(c => c.id === conn.target),
+      strength: conn.strength
+    })).filter(link => link.source && link.target);
+
     // Create simulation
     const simulation = d3.forceSimulation(categories)
-      .force("charge", d3.forceManyBody().strength(-1000))
+      .force("link", d3.forceLink(links).id((d: any) => d.id).distance(120).strength(d => (d as any).strength * 0.5))
+      .force("charge", d3.forceManyBody().strength(-800))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius(d => Math.max(40, (d as LifeCategory).weight * 6)));
+      .force("collision", d3.forceCollide().radius(d => Math.max(45, (d as LifeCategory).weight * 5)));
+
+    // Create links
+    const linkElements = svg.append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("stroke", "hsl(var(--border))")
+      .attr("stroke-opacity", 0.6)
+      .attr("stroke-width", d => Math.max(1, (d as any).strength * 4))
+      .attr("stroke-dasharray", "5,5");
 
     // Create nodes
     const nodes = svg.selectAll(".node")
@@ -148,6 +189,14 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
 
     // Update positions on simulation tick
     simulation.on("tick", () => {
+      // Update link positions
+      linkElements
+        .attr("x1", d => (d.source as any).x)
+        .attr("y1", d => (d.source as any).y)
+        .attr("x2", d => (d.target as any).x)
+        .attr("y2", d => (d.target as any).y);
+      
+      // Update node positions
       nodes.attr("transform", d => `translate(${d.x || 0}, ${d.y || 0})`);
     });
 
@@ -155,7 +204,7 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
     return () => {
       simulation.stop();
     };
-  }, [categories, width, height, onNodeClick]);
+  }, [categories, connections, width, height, onNodeClick]);
 
   return (
     <motion.div
