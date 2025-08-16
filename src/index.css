@@ -2,95 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Mojo Design System - Sophisticated life tracking with dark glassmorphic theme
+All colors MUST be HSL for consistency.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Mojo Dark Theme - Rich black with sophisticated accents */
+    --background: 240 6% 4%;  /* #0A0A0B - rich black */
+    --foreground: 0 0% 98%;   /* #FAFAFA - primary text */
+    
+    --surface: 240 5% 7%;     /* #111113 - surface cards */
+    --surface-elevated: 240 5% 9%; /* Elevated cards */
+    
+    --card: 240 5% 7%;        /* #111113 - glassmorphic cards */
+    --card-foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --popover: 240 5% 7%;
+    --popover-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 231 76% 62%;   /* #6366F1 - indigo with glow */
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 231 76% 80%; /* Lighter primary for glow effects */
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --secondary: 240 4% 64%;  /* #A1A1AA - secondary text */
+    --secondary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 240 5% 15%;      /* Muted backgrounds */
+    --muted-foreground: 240 4% 64%; /* #A1A1AA */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 231 76% 62%;    /* Same as primary for consistency */
+    --accent-foreground: 0 0% 98%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 240 6% 15%;     /* #27272A - zinc-800 borders */
+    --input: 240 5% 7%;
+    --ring: 231 76% 62%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --radius: 0.75rem;        /* Larger radius for modern feel */
 
-    --radius: 0.5rem;
+    /* Life Category Colors - Vibrant accents for nodes */
+    --health: 160 84% 39%;    /* #10B981 - emerald */
+    --money: 43 100% 51%;     /* #F59E0B - amber */
+    --career: 231 76% 62%;    /* #6366F1 - indigo */
+    --social: 328 86% 64%;    /* #EC4899 - pink */
+    --love: 0 84% 60%;        /* #EF4444 - red */
+    --growth: 263 70% 62%;    /* #8B5CF6 - violet */
+    --spirituality: 189 94% 43%; /* #06B6D4 - cyan */
 
-    --sidebar-background: 0 0% 98%;
+    /* Gradients and Effects */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-mesh: radial-gradient(ellipse at top, hsl(var(--primary) / 0.1), transparent 60%),
+                     radial-gradient(ellipse at bottom right, hsl(var(--growth) / 0.1), transparent 60%);
+    --gradient-glass: linear-gradient(135deg, 
+                      hsl(var(--surface) / 0.8), 
+                      hsl(var(--surface-elevated) / 0.6));
+    
+    /* Shadows and Glows */
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.3);
+    --shadow-glass: 0 8px 32px hsl(240 5% 2% / 0.4);
+    --shadow-node: 0 4px 20px hsl(var(--primary) / 0.2);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -99,7 +77,151 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
+    background-image: var(--gradient-mesh);
+    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+@layer components {
+  /* Glassmorphic Card Styles */
+  .glass-card {
+    @apply backdrop-blur-xl border border-border/50;
+    background: var(--gradient-glass);
+    box-shadow: var(--shadow-glass);
+  }
+  
+  .glass-card-elevated {
+    @apply backdrop-blur-xl border border-border/30;
+    background: linear-gradient(135deg, 
+                hsl(var(--surface-elevated) / 0.9), 
+                hsl(var(--surface) / 0.7));
+    box-shadow: var(--shadow-glass), 0 0 0 1px hsl(var(--border) / 0.1);
+  }
+
+  /* Interactive Elements */
+  .node-glow {
+    filter: drop-shadow(0 0 20px currentColor);
+    transition: var(--transition-smooth);
+  }
+  
+  .node-glow:hover {
+    filter: drop-shadow(0 0 30px currentColor) brightness(1.1);
+    transform: scale(1.05);
+  }
+
+  /* Life Score Display */
+  .score-ring {
+    @apply relative;
+  }
+  
+  .score-ring::after {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: conic-gradient(from 0deg, 
+                              hsl(var(--health)), 
+                              hsl(var(--money)), 
+                              hsl(var(--career)), 
+                              hsl(var(--social)), 
+                              hsl(var(--love)), 
+                              hsl(var(--growth)), 
+                              hsl(var(--spirituality)), 
+                              hsl(var(--health)));
+    mask: radial-gradient(circle at center, transparent 65%, black 70%);
+    -webkit-mask: radial-gradient(circle at center, transparent 65%, black 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-glass), 0 20px 40px hsl(var(--background) / 0.3);
+  }
+
+  /* Particle Effects */
+  .particles {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .particles::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(1px 1px at 25% 20%, hsl(var(--primary) / 0.3), transparent),
+      radial-gradient(1px 1px at 75% 80%, hsl(var(--growth) / 0.2), transparent),
+      radial-gradient(1px 1px at 90% 30%, hsl(var(--health) / 0.2), transparent);
+    background-size: 150px 150px, 200px 200px, 120px 120px;
+    animation: float 30s infinite ease-in-out alternate;
+  }
+
+  /* Text Effects */
+  .text-gradient {
+    background: linear-gradient(135deg, 
+                              hsl(var(--foreground)), 
+                              hsl(var(--primary)), 
+                              hsl(var(--growth)));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease-in-out infinite alternate;
+  }
+}
+
+@layer utilities {
+  /* Category Colors */
+  .text-health { color: hsl(var(--health)); }
+  .text-money { color: hsl(var(--money)); }
+  .text-career { color: hsl(var(--career)); }
+  .text-social { color: hsl(var(--social)); }
+  .text-love { color: hsl(var(--love)); }
+  .text-growth { color: hsl(var(--growth)); }
+  .text-spirituality { color: hsl(var(--spirituality)); }
+
+  .bg-health { background-color: hsl(var(--health)); }
+  .bg-money { background-color: hsl(var(--money)); }
+  .bg-career { background-color: hsl(var(--career)); }
+  .bg-social { background-color: hsl(var(--social)); }
+  .bg-love { background-color: hsl(var(--love)); }
+  .bg-growth { background-color: hsl(var(--growth)); }
+  .bg-spirituality { background-color: hsl(var(--spirituality)); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.02);
   }
 }
