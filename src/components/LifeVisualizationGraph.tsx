@@ -71,14 +71,18 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       strength: conn.strength
     })).filter(link => link.source && link.target);
 
-    // Create simulation
+    // Create simulation with better distribution
     const simulation = d3.forceSimulation(categories)
-      .force("link", d3.forceLink(links).id((d: any) => d.id).distance(120).strength(d => (d as any).strength * 0.5))
-      .force("charge", d3.forceManyBody().strength(-800))
+      .force("link", d3.forceLink(links).id((d: any) => d.id).distance(150).strength(d => (d as any).strength * 0.3))
+      .force("charge", d3.forceManyBody().strength(-1200))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius(d => Math.max(45, (d as LifeCategory).weight * 5)));
+      .force("collision", d3.forceCollide().radius(d => Math.max(60, (d as LifeCategory).weight * 7)))
+      .force("x", d3.forceX(width / 2).strength(0.1))
+      .force("y", d3.forceY(height / 2).strength(0.1))
+      .alphaDecay(0.01)
+      .velocityDecay(0.3);
 
-    // Create links
+    // Create links with animated particles
     const linkElements = svg.append("g")
       .attr("class", "links")
       .selectAll("line")
@@ -86,9 +90,10 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       .enter()
       .append("line")
       .attr("stroke", "hsl(var(--border))")
-      .attr("stroke-opacity", 0.6)
-      .attr("stroke-width", d => Math.max(1, (d as any).strength * 4))
-      .attr("stroke-dasharray", "5,5");
+      .attr("stroke-opacity", d => 0.3 + ((d as any).strength * 0.4))
+      .attr("stroke-width", d => Math.max(2, (d as any).strength * 3))
+      .attr("stroke-dasharray", "8,4")
+      .style("filter", "drop-shadow(0 0 4px hsl(var(--primary) / 0.3))");
 
     // Create nodes
     const nodes = svg.selectAll(".node")
@@ -115,73 +120,94 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
     feMerge.append("feMergeNode").attr("in", "coloredBlur");
     feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
-    // Add circles
+    // Add circles with improved styling
     const circles = nodes.append("circle")
-      .attr("r", d => Math.max(30, d.weight * 4))
+      .attr("r", d => Math.max(35, d.weight * 5))
       .style("fill", d => d.color)
-      .style("fill-opacity", 0.8)
+      .style("fill-opacity", 0.9)
       .style("stroke", d => d.color)
-      .style("stroke-width", 2)
-      .style("filter", "url(#glow)")
+      .style("stroke-width", 3)
+      .style("filter", "url(#glow) drop-shadow(0 4px 8px hsl(var(--foreground) / 0.1))")
       .style("transition", "all 0.3s ease");
 
-    // Add text labels
+    // Add emoji icons with better sizing
     nodes.append("text")
       .text(d => d.icon)
-      .style("font-size", "24px")
+      .style("font-size", d => `${Math.max(28, d.weight * 3.5)}px`)
       .style("text-anchor", "middle")
       .style("dominant-baseline", "central")
-      .style("pointer-events", "none");
+      .style("pointer-events", "none")
+      .style("filter", "drop-shadow(0 2px 4px hsl(var(--background) / 0.3))");
 
-    // Add category names
+    // Add category names with better positioning
     nodes.append("text")
       .text(d => d.name)
-      .attr("dy", d => Math.max(30, d.weight * 4) + 20)
-      .style("font-size", "12px")
+      .attr("dy", d => Math.max(40, d.weight * 6) + 25)
+      .style("font-size", "14px")
       .style("text-anchor", "middle")
       .style("fill", "hsl(var(--foreground))")
-      .style("font-weight", "500")
-      .style("pointer-events", "none");
+      .style("font-weight", "600")
+      .style("pointer-events", "none")
+      .style("filter", "drop-shadow(0 1px 2px hsl(var(--background) / 0.5))");
 
-    // Add score badges
+    // Add score badges with better styling
     nodes.append("circle")
-      .attr("cx", d => Math.max(20, d.weight * 3))
-      .attr("cy", d => -Math.max(20, d.weight * 3))
-      .attr("r", 12)
+      .attr("cx", d => Math.max(25, d.weight * 4))
+      .attr("cy", d => -Math.max(25, d.weight * 4))
+      .attr("r", 16)
       .style("fill", "hsl(var(--surface))")
       .style("stroke", d => d.color)
-      .style("stroke-width", 2);
+      .style("stroke-width", 2)
+      .style("filter", "drop-shadow(0 2px 4px hsl(var(--foreground) / 0.1))");
 
     nodes.append("text")
       .text(d => d.score)
-      .attr("x", d => Math.max(20, d.weight * 3))
-      .attr("y", d => -Math.max(20, d.weight * 3))
-      .style("font-size", "10px")
+      .attr("x", d => Math.max(25, d.weight * 4))
+      .attr("y", d => -Math.max(25, d.weight * 4))
+      .style("font-size", "12px")
       .style("text-anchor", "middle")
       .style("dominant-baseline", "central")
       .style("fill", "hsl(var(--foreground))")
-      .style("font-weight", "600")
+      .style("font-weight", "700")
       .style("pointer-events", "none");
 
-    // Add interactions
+    // Add interactions with improved hover effects
     nodes
       .on("mouseenter", function(event, d) {
         setHoveredNode(d.id);
         d3.select(this).select("circle")
           .transition()
           .duration(200)
-          .attr("r", Math.max(35, d.weight * 4.5))
+          .attr("r", Math.max(42, d.weight * 6))
           .style("fill-opacity", 1)
-          .style("stroke-width", 3);
+          .style("stroke-width", 4)
+          .style("filter", "url(#glow) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.2))");
+        
+        // Highlight connected links
+        linkElements
+          .style("stroke-opacity", link => {
+            const isConnected = (link.source as any).id === d.id || (link.target as any).id === d.id;
+            return isConnected ? 0.8 : 0.1;
+          })
+          .style("stroke-width", link => {
+            const isConnected = (link.source as any).id === d.id || (link.target as any).id === d.id;
+            return isConnected ? Math.max(3, (link as any).strength * 4) : Math.max(1, (link as any).strength * 2);
+          });
       })
       .on("mouseleave", function(event, d) {
         setHoveredNode(null);
         d3.select(this).select("circle")
           .transition()
           .duration(200)
-          .attr("r", Math.max(30, d.weight * 4))
-          .style("fill-opacity", 0.8)
-          .style("stroke-width", 2);
+          .attr("r", Math.max(35, d.weight * 5))
+          .style("fill-opacity", 0.9)
+          .style("stroke-width", 3)
+          .style("filter", "url(#glow) drop-shadow(0 4px 8px hsl(var(--foreground) / 0.1))");
+        
+        // Reset links
+        linkElements
+          .style("stroke-opacity", d => 0.3 + ((d as any).strength * 0.4))
+          .style("stroke-width", d => Math.max(2, (d as any).strength * 3));
       })
       .on("click", function(event, d) {
         onNodeClick?.(d);
@@ -205,6 +231,30 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       simulation.stop();
     };
   }, [categories, connections, width, height, onNodeClick]);
+
+  // Add drag functionality for better interactivity
+  const drag = d3.drag()
+    .on("start", function(event, d: any) {
+      if (!event.active) d3.select(svgRef.current).select("g").selectAll("circle").style("cursor", "grabbing");
+    })
+    .on("drag", function(event, d: any) {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", function(event, d: any) {
+      if (!event.active) {
+        d.fx = null;
+        d.fy = null;
+        d3.select(svgRef.current).select("g").selectAll("circle").style("cursor", "grab");
+      }
+    });
+
+  // Apply drag to nodes after creation
+  React.useEffect(() => {
+    if (svgRef.current) {
+      d3.select(svgRef.current).selectAll(".node").call(drag as any);
+    }
+  });
 
   return (
     <motion.div
