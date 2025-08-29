@@ -64,6 +64,11 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
+    // Calculate better dimensions with padding
+    const padding = 80;
+    const innerWidth = width - padding * 2;
+    const innerHeight = height - padding * 2;
+
     // Create links data for D3
     const links = connections.map(conn => ({
       source: categories.find(c => c.id === conn.source),
@@ -71,24 +76,41 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       strength: conn.strength
     })).filter(link => link.source && link.target);
 
-    // Create simulation
+    // Create simulation with better force parameters for even distribution
     const simulation = d3.forceSimulation(categories)
-      .force("link", d3.forceLink(links).id((d: any) => d.id).distance(120).strength(d => (d as any).strength * 0.5))
-      .force("charge", d3.forceManyBody().strength(-800))
+      .force("link", d3.forceLink(links)
+        .id((d: any) => d.id)
+        .distance(d => Math.min(innerWidth, innerHeight) * 0.25) // Responsive distance
+        .strength(d => (d as any).strength * 0.8))
+      .force("charge", d3.forceManyBody()
+        .strength(-Math.min(innerWidth, innerHeight) * 2) // Responsive repulsion
+        .distanceMax(Math.min(innerWidth, innerHeight) * 0.8))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius(d => Math.max(45, (d as LifeCategory).weight * 5)));
+      .force("collision", d3.forceCollide()
+        .radius(d => Math.max(40, (d as LifeCategory).weight * 4.5) + 10))
+      .force("x", d3.forceX(width / 2).strength(0.1)) // Keep nodes centered horizontally
+      .force("y", d3.forceY(height / 2).strength(0.1)) // Keep nodes centered vertically
+      .force("boundary", () => {
+        // Custom force to keep nodes within boundaries
+        categories.forEach((node: any) => {
+          if (node.x < padding) node.x = padding;
+          if (node.x > width - padding) node.x = width - padding;
+          if (node.y < padding) node.y = padding;
+          if (node.y > height - padding) node.y = height - padding;
+        });
+      });
 
-    // Create links
+    // Create enhanced links with gradients
     const linkElements = svg.append("g")
       .attr("class", "links")
       .selectAll("line")
       .data(links)
       .enter()
       .append("line")
-      .attr("stroke", "hsl(var(--border))")
-      .attr("stroke-opacity", 0.6)
-      .attr("stroke-width", d => Math.max(1, (d as any).strength * 4))
-      .attr("stroke-dasharray", "5,5");
+      .attr("stroke", "hsl(var(--muted-foreground))")
+      .attr("stroke-opacity", d => 0.4 + (d as any).strength * 0.4)
+      .attr("stroke-width", d => Math.max(2, (d as any).strength * 6))
+      .style("filter", "drop-shadow(0 0 3px hsl(var(--primary) / 0.3))");
 
     // Create nodes
     const nodes = svg.selectAll(".node")
@@ -115,15 +137,15 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
     feMerge.append("feMergeNode").attr("in", "coloredBlur");
     feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
-    // Add circles
+    // Add enhanced circles with better styling
     const circles = nodes.append("circle")
-      .attr("r", d => Math.max(30, d.weight * 4))
+      .attr("r", d => Math.max(35, d.weight * 5))
       .style("fill", d => d.color)
-      .style("fill-opacity", 0.8)
+      .style("fill-opacity", 0.9)
       .style("stroke", d => d.color)
-      .style("stroke-width", 2)
+      .style("stroke-width", 3)
       .style("filter", "url(#glow)")
-      .style("transition", "all 0.3s ease");
+      .style("box-shadow", "var(--shadow-node)");
 
     // Add text labels
     nodes.append("text")
@@ -131,16 +153,6 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       .style("font-size", "24px")
       .style("text-anchor", "middle")
       .style("dominant-baseline", "central")
-      .style("pointer-events", "none");
-
-    // Add category names
-    nodes.append("text")
-      .text(d => d.name)
-      .attr("dy", d => Math.max(30, d.weight * 4) + 20)
-      .style("font-size", "12px")
-      .style("text-anchor", "middle")
-      .style("fill", "hsl(var(--foreground))")
-      .style("font-weight", "500")
       .style("pointer-events", "none");
 
     // Add score badges
@@ -163,29 +175,57 @@ export const LifeVisualizationGraph: React.FC<LifeVisualizationGraphProps> = ({
       .style("font-weight", "600")
       .style("pointer-events", "none");
 
-    // Add interactions
+    // Add drag behavior
+    const dragBehavior = d3.drag()
+      .on("start", function(event, d: any) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      })
+      .on("drag", function(event, d: any) {
+        d.fx = event.x;
+        d.fy = event.y;
+      })
+      .on("end", function(event, d: any) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      });
+
+    // Add interactions with drag
     nodes
+      .call(dragBehavior as any)
       .on("mouseenter", function(event, d) {
         setHoveredNode(d.id);
         d3.select(this).select("circle")
           .transition()
           .duration(200)
-          .attr("r", Math.max(35, d.weight * 4.5))
+          .attr("r", Math.max(42, d.weight * 5.5))
           .style("fill-opacity", 1)
-          .style("stroke-width", 3);
+          .style("stroke-width", 4);
       })
       .on("mouseleave", function(event, d) {
         setHoveredNode(null);
         d3.select(this).select("circle")
           .transition()
           .duration(200)
-          .attr("r", Math.max(30, d.weight * 4))
-          .style("fill-opacity", 0.8)
-          .style("stroke-width", 2);
+          .attr("r", Math.max(35, d.weight * 5))
+          .style("fill-opacity", 0.9)
+          .style("stroke-width", 3);
       })
       .on("click", function(event, d) {
         onNodeClick?.(d);
       });
+
+    // Add category names with better positioning
+    nodes.append("text")
+      .text(d => d.name)
+      .attr("dy", d => Math.max(35, d.weight * 5) + 24)
+      .style("font-size", "13px")
+      .style("text-anchor", "middle")
+      .style("fill", "hsl(var(--foreground))")
+      .style("font-weight", "600")
+      .style("pointer-events", "none");
 
     // Update positions on simulation tick
     simulation.on("tick", () => {
